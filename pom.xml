@@ -32,7 +32,6 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
             <artifactId>aws-java-sdk</artifactId>
             <version>1.11.30</version>
         </dependency>
-
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
@@ -72,7 +71,6 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
                     <target>1.6</target>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -85,9 +83,6 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
                             org.wso2.carbon.inbound.amazonsqs.*,
                         </Export-Package>
                         <Import-Package>
-                            <!--javax.net.ssl.*,
-                            org.apache.http.*; version=4.5.2,
-                            org.apache.http.conn.ssl.*; version=4.5.2,-->
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional,

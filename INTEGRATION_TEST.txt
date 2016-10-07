@@ -26,7 +26,7 @@ Sample Inbound Configuration:
          <parameter name="destination">URL of the Amazon SQS Queue</parameter>
          <parameter name="accessKey">AccessKey to interact with Amazon SQS</parameter>
          <parameter name="secretKey">SecretKey to interact with Amazon SQS</parameter>
-         <parameter name="attributeNames">attributeName1, contentType</parameter>
+         <parameter name="attributeNames">attributeName1,contentType</parameter>
          <parameter name="contentType">text/plain</parameter>
      </parameters>
 </inboundEndpoint>
