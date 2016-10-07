@@ -20,6 +20,8 @@ package org.wso2.carbon.inbound.amazonsqs;
 
 /**
  * Common constants used by AmazonSQS inbound endpoint
+ *
+ * @since 1.0.0
  */
 public class AmazonSQSConstant {
     public static final String AMAZONSQS_SQS_WAIT_TIME = "wait_time";
@@ -31,4 +33,5 @@ public class AmazonSQSConstant {
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
     public static final String SET_ROLLBACK_ONLY = "SET_ROLLBACK_ONLY";
     public static final String ATTRIBUTE_NAMES = "attributeNames";
+    public static final String ALL = "All";
 }

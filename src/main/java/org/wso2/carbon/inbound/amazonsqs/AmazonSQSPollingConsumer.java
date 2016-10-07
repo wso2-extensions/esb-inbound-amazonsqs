@@ -49,6 +49,8 @@ import java.util.Properties;
 
 /**
  * AmazonSQS inbound endpoint is used to consume messages via WSO2 ESB
+ *
+ * @since 1.0.0
  */
 public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
 
@@ -154,7 +156,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             if (attributeNames == null) {
                 //if attribute names are not define get all the attribute with message
                 messages = sqsClient.receiveMessage(
-                        receiveMessageRequest.withMessageAttributeNames("All")).getMessages();
+                        receiveMessageRequest.withMessageAttributeNames(AmazonSQSConstant.ALL)).getMessages();
             } else {
                 messages = sqsClient.receiveMessage(
                         receiveMessageRequest.withMessageAttributeNames(attributeNames)).getMessages();
@@ -167,8 +169,8 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                                 + injectingSeq + " of " + name);
                     }
                     //Get the content type of the message
-                    if (message.getMessageAttributes().containsKey("contentType")) {
-                        contentType = message.getMessageAttributes().get("contentType").getStringValue();
+                    if (message.getMessageAttributes().containsKey(AmazonSQSConstant.CONTENT_TYPE)) {
+                        contentType = message.getMessageAttributes().get(AmazonSQSConstant.CONTENT_TYPE).getStringValue();
                         if (contentType.trim().equals("") || contentType.equals("null")) {
                             contentType = AmazonSQSConstant.DEFAULT_CONTENT_TYPE;
                         }
@@ -200,6 +202,10 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         return null;
     }
 
+    /**
+     * Inject the message into the sequence
+     *
+     */
     @Override
     protected boolean injectMessage(String strMessage, String contentType) {
         AutoCloseInputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
@@ -253,6 +259,10 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         return true;
     }
 
+    /**
+     * Check whether the message is rollbacked or not
+     *
+     */
     private boolean isRollback(org.apache.synapse.MessageContext msgCtx) {
         // First check for rollback property from synapse context
         Object rollbackProp = msgCtx.getProperty(AmazonSQSConstant.SET_ROLLBACK_ONLY);
@@ -266,6 +276,10 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         return false;
     }
 
+    /**
+     * Create the message context
+     *
+     */
     private MessageContext createMessageContext() {
         MessageContext msgCtx = this.synapseEnvironment.createMessageContext();
         org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) msgCtx).getAxis2MessageContext();
