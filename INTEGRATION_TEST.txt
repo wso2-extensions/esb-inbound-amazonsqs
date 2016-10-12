@@ -1,0 +1,34 @@
+Pre-requisites:
+
+ - Maven 3.x
+ - Java 1.7
+ - The org.wso2.esb.integration.integration-base project is required. The test suite has been configured to download this project automatically. If the automatic download fails, download the following project and compile it using the mvn clean install command to update your local repository:
+   https://github.com/wso2-extensions/esb-connector-integrationbase
+
+Tested Platform:
+
+ - UBUNTU 16.04
+ - WSO2 ESB 5.0.0
+
+ 
+Sample Inbound Configuration:
+
+<inboundEndpoint
+     class="org.wso2.carbon.inbound.amazonsqs.AmazonSQSPollingConsumer"
+     name="AmazonSQS" onError="fault" sequence="request" suspend="false">
+     <parameters>
+         <parameter name="sequential">true</parameter>
+         <parameter name="interval">2000</parameter>
+         <parameter name="coordination">true</parameter>
+         <parameter name="waitTime">19</parameter>
+         <parameter name="maxNoOfMessage">10</parameter>
+         <parameter name="destination">URL of the Amazon SQS Queue</parameter>
+         <parameter name="accessKey">AccessKey to interact with Amazon SQS</parameter>
+         <parameter name="secretKey">SecretKey to interact with Amazon SQS</parameter>
+         <parameter name="attributeNames">attributeName1,contentType</parameter>
+         <parameter name="contentType">text/plain</parameter>
+     </parameters>
+</inboundEndpoint>
+
+  Navigate to "<INBOUND_HOME>" and run the following command.
+  $ mvn clean install
