@@ -7,7 +7,6 @@ Pre-requisites:
 
 Tested Platform:
 
- - Microsoft WINDOWS V-7
  - UBUNTU 16.04
  - WSO2 ESB 5.0.0
 

@@ -32,6 +32,7 @@ import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.SOAPBuilder;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -41,35 +42,33 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericPollingConsumer;
 import com.amazonaws.services.sqs.model.Message;
-import org.wso2.carbon.utils.xml.StringUtils;
-
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Properties;
 
 /**
- * AmazonSQS inbound endpoint is used to consume messages via WSO2 ESB
+ * AmazonSQS inbound endpoint is used to consume messages via WSO2 ESB.
  *
- * @since 1.0.0
+ * @since 1.0.0.
  */
 public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
 
     private static final Log logger = LogFactory.getLog(AmazonSQSPollingConsumer.class.getName());
-    //The time limit to wait when polling queues for messages
+    //The time limit to wait when polling queues for messages.
     private int waitTime;
-    //Maximum no of messages per poll
+    //Maximum no of messages per poll.
     private int maxNoOfMessage;
     private BasicAWSCredentials credentials;
     private AmazonSQS sqsClient;
-    //To check the connection to the Amazon SQS Queue
+    //To check the connection to the Amazon SQS Queue.
     private boolean isConnected;
     //URL of the Amazon SQS Queue from which you want to consume messages.
     private String destination;
     private ReceiveMessageRequest receiveMessageRequest;
     private String messageReceiptHandle;
-    //list of attributes need to be receive along with the message
+    //list of attributes need to be receive along with the message.
     private String[] attributeNames;
-    //Content type of the message
+    //Content type of the message.
     private String contentType;
 
     public AmazonSQSPollingConsumer(Properties amazonsqsProperties, String name,
@@ -84,9 +83,9 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             logger.debug("Starting to load the AmazonSQS Properties for " + name);
         }
         this.destination = properties.getProperty(AmazonSQSConstant.DESTINATION);
-        //AccessKey to interact with Amazon SQS
+        //AccessKey to interact with Amazon SQS.
         String accessKey = properties.getProperty(AmazonSQSConstant.AMAZONSQS_ACCESSKEY);
-        //SecretKey to interact with Amazon SQS
+        //SecretKey to interact with Amazon SQS.
         String secretKey = properties.getProperty(AmazonSQSConstant.AMAZONSQS_SECRETKEY);
         if (StringUtils.isEmpty(destination)) {
             throw new SynapseException("URL for the AmazonSQS Queue is empty");
@@ -97,13 +96,13 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         if (StringUtils.isEmpty(secretKey)) {
             throw new SynapseException("Secretkey is empty");
         }
-        if (!StringUtils.isEmpty(properties.getProperty(AmazonSQSConstant.AMAZONSQS_SQS_WAIT_TIME))) {
+        if (StringUtils.isNotEmpty(properties.getProperty(AmazonSQSConstant.AMAZONSQS_SQS_WAIT_TIME))) {
             this.waitTime = Integer.parseInt(properties
                     .getProperty(AmazonSQSConstant.AMAZONSQS_SQS_WAIT_TIME));
         } else {
             this.waitTime = 0;
         }
-        if (!StringUtils.isEmpty(properties
+        if (StringUtils.isNotEmpty(properties
                 .getProperty(AmazonSQSConstant.AMAZONSQS_SQS_MAX_NO_OF_MESSAGE))) {
             this.maxNoOfMessage = Integer.parseInt(properties
                     .getProperty(AmazonSQSConstant.AMAZONSQS_SQS_MAX_NO_OF_MESSAGE));
@@ -136,7 +135,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
 
     /**
      * Create connection with broker and retrieve the messages. Then inject
-     * according to the registered handler
+     * according to the registered handler.
      */
     public Message poll() {
         if (logger.isDebugEnabled()) {
@@ -154,7 +153,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             }
             List<Message> messages;
             if (attributeNames == null) {
-                //if attribute names are not define get all the attribute with message
+                //if attribute names are not define get all the attribute with message.
                 messages = sqsClient.receiveMessage(
                         receiveMessageRequest.withMessageAttributeNames(AmazonSQSConstant.ALL)).getMessages();
             } else {
@@ -168,7 +167,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                         logger.debug("Injecting AmazonSQS message to the sequence : "
                                 + injectingSeq + " of " + name);
                     }
-                    //Get the content type of the message
+                    //Get the content type of the message.
                     if (message.getMessageAttributes().containsKey(AmazonSQSConstant.CONTENT_TYPE)) {
                         contentType = message.getMessageAttributes().get(AmazonSQSConstant.CONTENT_TYPE).getStringValue();
                         if (contentType.trim().equals("") || contentType.equals("null")) {
@@ -191,11 +190,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                 return null;
             }
         } catch (AmazonServiceException e) {
-            throw new AmazonServiceException("Caught an AmazonServiceException, which means your " +
+            throw new SynapseException("Caught an AmazonServiceException, which means your " +
                     "request made it to Amazon SQS, but was rejected with an" +
                     "error response for some reason.", e);
         } catch (AmazonClientException e) {
-            throw new AmazonClientException("Caught an AmazonClientException, which means the client" +
+            throw new SynapseException("Caught an AmazonClientException, which means the client" +
                     " encountered a serious internal problem while trying to communicate with SQS, " +
                     "such as not being able to access the network.", e);
         }
@@ -203,7 +202,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     }
 
     /**
-     * Inject the message into the sequence
+     * Inject the message into the sequence.
      *
      */
     @Override
@@ -260,11 +259,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     }
 
     /**
-     * Check whether the message is rollbacked or not
+     * Check whether the message is rollbacked or not.
      *
      */
     private boolean isRollback(org.apache.synapse.MessageContext msgCtx) {
-        // First check for rollback property from synapse context
+        // First check for rollback property from synapse context.
         Object rollbackProp = msgCtx.getProperty(AmazonSQSConstant.SET_ROLLBACK_ONLY);
         if (rollbackProp != null) {
             if ((rollbackProp instanceof Boolean && ((Boolean) rollbackProp))
@@ -277,7 +276,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     }
 
     /**
-     * Create the message context
+     * Create the message context.
      *
      */
     private MessageContext createMessageContext() {
@@ -288,6 +287,9 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         return msgCtx;
     }
 
+    /**
+     * Close the connection to the Amazon SQS.
+     */
     public void destroy() {
         try {
             if (sqsClient != null) {
