@@ -91,7 +91,6 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
                             javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional,
                         </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -105,7 +104,7 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
         </repository>
     </distributionManagement>
     <properties>
-	 <amazonaws.version>1.11.30</amazonaws.version>
+        <amazonaws.version>1.11.30</amazonaws.version>
         <carbon.mediation.version>4.4.10</carbon.mediation.version>
     </properties>
 </project>

@@ -43,6 +43,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericPollingConsumer;
 import com.amazonaws.services.sqs.model.Message;
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -67,7 +68,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     private ReceiveMessageRequest receiveMessageRequest;
     private String messageReceiptHandle;
     //list of attributes need to be receive along with the message.
-    private String[] attributeNames;
+    private List<String> attributeNames;
     //Content type of the message.
     private String contentType;
 
@@ -82,11 +83,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         if (logger.isDebugEnabled()) {
             logger.debug("Starting to load the AmazonSQS Properties for " + name);
         }
-        this.destination = properties.getProperty(AmazonSQSConstant.DESTINATION);
+        this.destination = properties.getProperty(AmazonSQSConstants.DESTINATION);
         //AccessKey to interact with Amazon SQS.
-        String accessKey = properties.getProperty(AmazonSQSConstant.AMAZONSQS_ACCESSKEY);
+        String accessKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_ACCESSKEY);
         //SecretKey to interact with Amazon SQS.
-        String secretKey = properties.getProperty(AmazonSQSConstant.AMAZONSQS_SECRETKEY);
+        String secretKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_SECRETKEY);
         if (StringUtils.isEmpty(destination)) {
             throw new SynapseException("URL for the AmazonSQS Queue is empty");
         }
@@ -96,16 +97,16 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         if (StringUtils.isEmpty(secretKey)) {
             throw new SynapseException("Secretkey is empty");
         }
-        if (StringUtils.isNotEmpty(properties.getProperty(AmazonSQSConstant.AMAZONSQS_SQS_WAIT_TIME))) {
+        if (StringUtils.isNotEmpty(properties.getProperty(AmazonSQSConstants.AMAZONSQS_SQS_WAIT_TIME))) {
             this.waitTime = Integer.parseInt(properties
-                    .getProperty(AmazonSQSConstant.AMAZONSQS_SQS_WAIT_TIME));
+                    .getProperty(AmazonSQSConstants.AMAZONSQS_SQS_WAIT_TIME));
         } else {
             this.waitTime = 0;
         }
         if (StringUtils.isNotEmpty(properties
-                .getProperty(AmazonSQSConstant.AMAZONSQS_SQS_MAX_NO_OF_MESSAGE))) {
+                .getProperty(AmazonSQSConstants.AMAZONSQS_SQS_MAX_NO_OF_MESSAGE))) {
             this.maxNoOfMessage = Integer.parseInt(properties
-                    .getProperty(AmazonSQSConstant.AMAZONSQS_SQS_MAX_NO_OF_MESSAGE));
+                    .getProperty(AmazonSQSConstants.AMAZONSQS_SQS_MAX_NO_OF_MESSAGE));
         } else {
             this.maxNoOfMessage = 1;
         }
@@ -117,8 +118,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             throw new SynapseException("Value " + maxNoOfMessage
                     + " for parameter MaxNumberOfMessages is invalid. Must be between 1 and 10");
         }
-        if (properties.getProperty(AmazonSQSConstant.ATTRIBUTE_NAMES) != null) {
-            this.attributeNames = properties.getProperty(AmazonSQSConstant.ATTRIBUTE_NAMES).split(",");
+        if (properties.getProperty(AmazonSQSConstants.ATTRIBUTE_NAMES) != null) {
+            this.attributeNames = Arrays.asList(properties.getProperty(AmazonSQSConstants.ATTRIBUTE_NAMES).split(","));
+        } else {
+            //if attribute names are not define get all the attribute with message.
+            this.attributeNames = Arrays.asList(AmazonSQSConstants.ALL);
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Loaded the AmazonSQS Parameters with AccessKey : " + accessKey
@@ -152,14 +156,8 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                 return null;
             }
             List<Message> messages;
-            if (attributeNames == null) {
-                //if attribute names are not define get all the attribute with message.
-                messages = sqsClient.receiveMessage(
-                        receiveMessageRequest.withMessageAttributeNames(AmazonSQSConstant.ALL)).getMessages();
-            } else {
-                messages = sqsClient.receiveMessage(
-                        receiveMessageRequest.withMessageAttributeNames(attributeNames)).getMessages();
-            }
+            receiveMessageRequest.setMessageAttributeNames(attributeNames);
+            messages = sqsClient.receiveMessage(receiveMessageRequest).getMessages();
             if (!messages.isEmpty()) {
                 for (Message message : messages) {
                     boolean commitOrRollbacked;
@@ -168,13 +166,13 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                                 + injectingSeq + " of " + name);
                     }
                     //Get the content type of the message.
-                    if (message.getMessageAttributes().containsKey(AmazonSQSConstant.CONTENT_TYPE)) {
-                        contentType = message.getMessageAttributes().get(AmazonSQSConstant.CONTENT_TYPE).getStringValue();
+                    if (message.getMessageAttributes().containsKey(AmazonSQSConstants.CONTENT_TYPE)) {
+                        contentType = message.getMessageAttributes().get(AmazonSQSConstants.CONTENT_TYPE).getStringValue();
                         if (contentType.trim().equals("") || contentType.equals("null")) {
-                            contentType = AmazonSQSConstant.DEFAULT_CONTENT_TYPE;
+                            contentType = AmazonSQSConstants.DEFAULT_CONTENT_TYPE;
                         }
                     } else {
-                        contentType = properties.getProperty(AmazonSQSConstant.CONTENT_TYPE);
+                        contentType = properties.getProperty(AmazonSQSConstants.CONTENT_TYPE);
                     }
                     if (logger.isDebugEnabled()) {
                         logger.debug("Loading the Content-type : " + contentType + " for " + name);
@@ -217,7 +215,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             Builder builder;
             if (StringUtils.isEmpty(contentType)) {
                 logger.warn("Unable to determine content type for message, setting to text/plain for " + name);
-                contentType = AmazonSQSConstant.DEFAULT_CONTENT_TYPE;
+                contentType = AmazonSQSConstants.DEFAULT_CONTENT_TYPE;
             }
             int index = contentType.indexOf(';');
             String type = index > 0 ? contentType.substring(0, index) : contentType;
@@ -264,7 +262,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
      */
     private boolean isRollback(org.apache.synapse.MessageContext msgCtx) {
         // First check for rollback property from synapse context.
-        Object rollbackProp = msgCtx.getProperty(AmazonSQSConstant.SET_ROLLBACK_ONLY);
+        Object rollbackProp = msgCtx.getProperty(AmazonSQSConstants.SET_ROLLBACK_ONLY);
         if (rollbackProp != null) {
             if ((rollbackProp instanceof Boolean && ((Boolean) rollbackProp))
                     || (rollbackProp instanceof String && Boolean.valueOf((String) rollbackProp))) {
