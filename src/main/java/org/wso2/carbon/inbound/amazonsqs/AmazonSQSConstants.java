@@ -23,7 +23,7 @@ package org.wso2.carbon.inbound.amazonsqs;
  *
  * @since 1.0.0.
  */
-public class AmazonSQSConstant {
+public class AmazonSQSConstants {
     public static final String AMAZONSQS_SQS_WAIT_TIME = "wait_time";
     public static final String AMAZONSQS_SQS_MAX_NO_OF_MESSAGE = "maxNoOfMessage";
     public static final String DESTINATION = "destination";
