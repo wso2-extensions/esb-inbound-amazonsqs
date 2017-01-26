@@ -27,13 +27,23 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
+            <artifactId>aws-java-sdk-osgi</artifactId>
             <version>${amazonaws.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
             <version>${carbon.mediation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient-osgi</artifactId>
+            <version>${httpclient.osgi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore-osgi</artifactId>
+            <version>${httpcore.osgi.version}</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -144,9 +154,12 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
+                            org.apache.http.*; version=${httpcore.osgi.version},
+                            com.amazonaws.*; version="${amazonaws.version}",
                             javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional,
                         </Import-Package>
+                        <Embed-Dependency>httpcore-osgi,httpclient-osgi,aws-java-sdk-osgi;scope=*</Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
@@ -167,5 +180,7 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
     <properties>
         <amazonaws.version>1.11.30</amazonaws.version>
         <carbon.mediation.version>4.4.10</carbon.mediation.version>
+        <httpclient.osgi.version>4.5.2</httpclient.osgi.version>
+        <httpcore.osgi.version>4.4.4</httpcore.osgi.version>
     </properties>
 </project>
