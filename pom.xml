@@ -16,11 +16,13 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 * specific language governing permissions and limitations
 * under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.synapse.inbound.amazonsqs</groupId>
     <artifactId>org.apache.synapse.amazonsqs.poll.class</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>AmazonSQS Polling Consumer</name>
     <url>http://wso2.org</url>
     <packaging>bundle</packaging>
@@ -91,9 +93,13 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
         </repository>
     </repositories>
     <scm>
-        <connection>scm:git:https://github.com/wso2-extensions/esb-inbound-amazonsqs.git</connection>
+        <connection>
+            scm:git:https://github.com/wso2-extensions/esb-inbound-amazonsqs.git
+        </connection>
         <url>https://github.com/wso2-extensions/esb-inbound-amazonsqs.git</url>
-        <developerConnection>scm:git:https://github.com/wso2-extensions/esb-inbound-amazonsqs</developerConnection>
+        <developerConnection>
+            scm:git:https://github.com/wso2-extensions/esb-inbound-amazonsqs
+        </developerConnection>
         <tag>HEAD</tag>
     </scm>
     <pluginRepositories>
@@ -159,7 +165,8 @@ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
                             javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional,
                         </Import-Package>
-                        <Embed-Dependency>httpcore-osgi,httpclient-osgi,aws-java-sdk-osgi;scope=*</Embed-Dependency>
+                        <Embed-Dependency>httpcore-osgi,httpclient-osgi,aws-java-sdk-osgi;scope=*
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
