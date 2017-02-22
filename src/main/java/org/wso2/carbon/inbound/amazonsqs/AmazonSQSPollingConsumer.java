@@ -89,7 +89,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         }
         this.destination = properties.getProperty(AmazonSQSConstants.DESTINATION);
         String autoRemoveMessage = properties.getProperty(AmazonSQSConstants.AUTO_REMOVE_MESSAGE);
-        this.autoRemoveMessage = StringUtils.isNotEmpty(autoRemoveMessage) && Boolean.parseBoolean(autoRemoveMessage);
+        this.autoRemoveMessage = !StringUtils.isNotEmpty(autoRemoveMessage) || Boolean.parseBoolean(autoRemoveMessage);
         //AccessKey to interact with Amazon SQS.
         String accessKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_ACCESSKEY);
         //SecretKey to interact with Amazon SQS.
