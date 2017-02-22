@@ -21,7 +21,7 @@ package org.wso2.carbon.inbound.amazonsqs;
 /**
  * Common constants used by AmazonSQS inbound endpoint.
  *
- * @since 1.0.0.
+ * @since 1.0.3.
  */
 public class AmazonSQSConstants {
     public static final String AMAZONSQS_SQS_WAIT_TIME = "wait_time";
