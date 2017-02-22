@@ -34,4 +34,5 @@ public class AmazonSQSConstants {
     public static final String SET_ROLLBACK_ONLY = "SET_ROLLBACK_ONLY";
     public static final String ATTRIBUTE_NAMES = "attributeNames";
     public static final String ALL = "All";
+    public static final String AUTO_REMOVE_MESSAGE = "autoRemoveMessage";
 }
