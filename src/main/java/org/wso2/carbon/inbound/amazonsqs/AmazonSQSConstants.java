@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * <p>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,7 +21,7 @@ package org.wso2.carbon.inbound.amazonsqs;
 /**
  * Common constants used by AmazonSQS inbound endpoint.
  *
- * @since 1.0.0.
+ * @since 1.0.3.
  */
 public class AmazonSQSConstants {
     public static final String AMAZONSQS_SQS_WAIT_TIME = "wait_time";
@@ -34,4 +34,5 @@ public class AmazonSQSConstants {
     public static final String SET_ROLLBACK_ONLY = "SET_ROLLBACK_ONLY";
     public static final String ATTRIBUTE_NAMES = "attributeNames";
     public static final String ALL = "All";
+    public static final String AUTO_REMOVE_MESSAGE = "autoRemoveMessage";
 }

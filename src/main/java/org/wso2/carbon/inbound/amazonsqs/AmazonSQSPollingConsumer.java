@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * <p>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
@@ -42,15 +43,17 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericPollingConsumer;
 import com.amazonaws.services.sqs.model.Message;
+
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
  * AmazonSQS inbound endpoint is used to consume messages via WSO2 ESB.
  *
- * @since 1.0.0.
+ * @since 1.0.3.
  */
 public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
 
@@ -71,6 +74,9 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     private List<String> attributeNames;
     //Content type of the message.
     private String contentType;
+    private MessageContext msgCtx;
+    //To check whether the message need to be deleted or not from the queue.
+    private boolean autoRemoveMessage;
 
     public AmazonSQSPollingConsumer(Properties amazonsqsProperties, String name,
                                     SynapseEnvironment synapseEnvironment, long scanInterval,
@@ -84,6 +90,8 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             logger.debug("Starting to load the AmazonSQS Properties for " + name);
         }
         this.destination = properties.getProperty(AmazonSQSConstants.DESTINATION);
+        String autoRemoveMessage = properties.getProperty(AmazonSQSConstants.AUTO_REMOVE_MESSAGE);
+        this.autoRemoveMessage = !StringUtils.isNotEmpty(autoRemoveMessage) || Boolean.parseBoolean(autoRemoveMessage);
         //AccessKey to interact with Amazon SQS.
         String accessKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_ACCESSKEY);
         //SecretKey to interact with Amazon SQS.
@@ -177,11 +185,28 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Loading the Content-type : " + contentType + " for " + name);
                     }
+                    msgCtx = this.createMessageContext();
+                    msgCtx.setProperty("MessageId", message.getMessageId());
+                    msgCtx.setProperty("ReceiptHandle", message.getReceiptHandle());
+                    msgCtx.setProperty("MD5OfBody", message.getMD5OfBody());
+                    String key;
+                    MessageAttributeValue value;
+                    Map<String, MessageAttributeValue> messageAttributes = message.getMessageAttributes();
+                    for (Map.Entry<String, MessageAttributeValue> entry : messageAttributes.entrySet()) {
+                        key = entry.getKey();
+                        value = entry.getValue();
+                        if(StringUtils.isNotEmpty(key) && value != null){
+                            if (StringUtils.equals(value.getDataType(), "Binary")) {
+                                msgCtx.setProperty(key, value.getBinaryValue().toString());
+                            } else {
+                                msgCtx.setProperty(key, value.getStringValue());
+                            }
+                        }
+                    }
                     commitOrRollbacked = injectMessage(message.getBody(), contentType);
-                    if (commitOrRollbacked) {
+                    if (commitOrRollbacked && autoRemoveMessage) {
                         messageReceiptHandle = message.getReceiptHandle();
-                        sqsClient.deleteMessage(new DeleteMessageRequest(destination,
-                                messageReceiptHandle));
+                        sqsClient.deleteMessage(new DeleteMessageRequest(destination, messageReceiptHandle));
                     }
                 }
             } else {
@@ -201,13 +226,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
 
     /**
      * Inject the message into the sequence.
-     *
      */
     @Override
     protected boolean injectMessage(String strMessage, String contentType) {
         AutoCloseInputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
         try {
-            MessageContext msgCtx = this.createMessageContext();
             if (logger.isDebugEnabled()) {
                 logger.debug("Processed Custom inbound EP Message of Content-type : " + contentType + " for " + name);
             }
@@ -258,7 +281,6 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
 
     /**
      * Check whether the message is rollbacked or not.
-     *
      */
     private boolean isRollback(org.apache.synapse.MessageContext msgCtx) {
         // First check for rollback property from synapse context.
@@ -275,7 +297,6 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
 
     /**
      * Create the message context.
-     *
      */
     private MessageContext createMessageContext() {
         MessageContext msgCtx = this.synapseEnvironment.createMessageContext();

@@ -27,6 +27,7 @@ Sample Inbound Configuration:
          <parameter name="secretKey">SecretKey to interact with Amazon SQS</parameter>
          <parameter name="attributeNames">attributeName1,contentType</parameter>
          <parameter name="contentType">text/plain</parameter>
+         <parameter name="autoRemoveMessage">true</parameter>
      </parameters>
 </inboundEndpoint>
 
