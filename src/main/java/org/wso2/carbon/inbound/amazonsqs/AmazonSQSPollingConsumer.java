@@ -189,13 +189,18 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                     msgCtx.setProperty("MessageId", message.getMessageId());
                     msgCtx.setProperty("ReceiptHandle", message.getReceiptHandle());
                     msgCtx.setProperty("MD5OfBody", message.getMD5OfBody());
-
+                    String key;
+                    MessageAttributeValue value;
                     Map<String, MessageAttributeValue> messageAttributes = message.getMessageAttributes();
                     for (Map.Entry<String, MessageAttributeValue> entry : messageAttributes.entrySet()) {
-                        if (StringUtils.equals(entry.getValue().getDataType(), "Binary")) {
-                            msgCtx.setProperty(entry.getKey(), entry.getValue().getBinaryValue().toString());
-                        } else {
-                            msgCtx.setProperty(entry.getKey(), entry.getValue().getStringValue());
+                        key = entry.getKey();
+                        value = entry.getValue();
+                        if(StringUtils.isNotEmpty(key) && value != null){
+                            if (StringUtils.equals(value.getDataType(), "Binary")) {
+                                msgCtx.setProperty(key, value.getBinaryValue().toString());
+                            } else {
+                                msgCtx.setProperty(key, value.getStringValue());
+                            }
                         }
                     }
                     commitOrRollbacked = injectMessage(message.getBody(), contentType);
