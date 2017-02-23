@@ -24,6 +24,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
@@ -46,6 +47,7 @@ import com.amazonaws.services.sqs.model.Message;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -187,9 +189,15 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                     msgCtx.setProperty("MessageId", message.getMessageId());
                     msgCtx.setProperty("ReceiptHandle", message.getReceiptHandle());
                     msgCtx.setProperty("MD5OfBody", message.getMD5OfBody());
-                    msgCtx.setProperty("Attributes", message.getAttributes());
-                    msgCtx.setProperty("MessageAttributes", message.getMessageAttributes());
 
+                    Map<String, MessageAttributeValue> messageAttributes = message.getMessageAttributes();
+                    for (Map.Entry<String, MessageAttributeValue> entry : messageAttributes.entrySet()) {
+                        if (StringUtils.equals(entry.getValue().getDataType(), "Binary")) {
+                            msgCtx.setProperty(entry.getKey(), entry.getValue().getBinaryValue().toString());
+                        } else {
+                            msgCtx.setProperty(entry.getKey(), entry.getValue().getStringValue());
+                        }
+                    }
                     commitOrRollbacked = injectMessage(message.getBody(), contentType);
                     if (commitOrRollbacked && autoRemoveMessage) {
                         messageReceiptHandle = message.getReceiptHandle();
