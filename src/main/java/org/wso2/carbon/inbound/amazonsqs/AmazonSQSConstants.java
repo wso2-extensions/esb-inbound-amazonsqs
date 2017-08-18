@@ -35,4 +35,7 @@ public class AmazonSQSConstants {
     public static final String ATTRIBUTE_NAMES = "attributeNames";
     public static final String ALL = "All";
     public static final String AUTO_REMOVE_MESSAGE = "autoRemoveMessage";
+    
+    public static final String AMAZONSQS_REQUIRE_AWS_KEYS = "requireAWSKeys";
+    public static final String YES = "yes";
 }
