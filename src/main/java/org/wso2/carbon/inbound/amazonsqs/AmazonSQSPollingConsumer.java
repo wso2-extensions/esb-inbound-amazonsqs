@@ -21,11 +21,13 @@ package org.wso2.carbon.inbound.amazonsqs;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axis2.builder.Builder;
@@ -42,6 +44,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericPollingConsumer;
+
 import com.amazonaws.services.sqs.model.Message;
 
 import java.io.ByteArrayInputStream;
@@ -77,6 +80,8 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     private MessageContext msgCtx;
     //To check whether the message need to be deleted or not from the queue.
     private boolean autoRemoveMessage;
+    // To check whether AccessKey and SecretKey is required
+    private boolean isRequireKeys;
 
     public AmazonSQSPollingConsumer(Properties amazonsqsProperties, String name,
                                     SynapseEnvironment synapseEnvironment, long scanInterval,
@@ -92,18 +97,36 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         this.destination = properties.getProperty(AmazonSQSConstants.DESTINATION);
         String autoRemoveMessage = properties.getProperty(AmazonSQSConstants.AUTO_REMOVE_MESSAGE);
         this.autoRemoveMessage = !StringUtils.isNotEmpty(autoRemoveMessage) || Boolean.parseBoolean(autoRemoveMessage);
+        
+        String requireKeys = properties.getProperty(AmazonSQSConstants.AMAZONSQS_REQUIRE_AWS_KEYS);
+        isRequireKeys = AmazonSQSConstants.YES.equals(properties.getProperty(AmazonSQSConstants.AMAZONSQS_REQUIRE_AWS_KEYS));
+        
+        if(StringUtils.isEmpty(requireKeys)){
+        	throw new SynapseException("requireAWSKeys is empty");
+        }
+        
         //AccessKey to interact with Amazon SQS.
-        String accessKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_ACCESSKEY);
+        String accessKey = null;
         //SecretKey to interact with Amazon SQS.
-        String secretKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_SECRETKEY);
+        String secretKey = null;
+        
+        
+        if(isRequireKeys){
+        	
+            accessKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_ACCESSKEY);
+            secretKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_SECRETKEY);
+        	
+            if (StringUtils.isEmpty(accessKey)) {
+                throw new SynapseException("Accesskey is empty");
+            }
+            if (StringUtils.isEmpty(secretKey)) {
+                throw new SynapseException("Secretkey is empty");
+            }
+        }
+        
+
         if (StringUtils.isEmpty(destination)) {
             throw new SynapseException("URL for the AmazonSQS Queue is empty");
-        }
-        if (StringUtils.isEmpty(accessKey)) {
-            throw new SynapseException("Accesskey is empty");
-        }
-        if (StringUtils.isEmpty(secretKey)) {
-            throw new SynapseException("Secretkey is empty");
         }
         if (StringUtils.isNotEmpty(properties.getProperty(AmazonSQSConstants.AMAZONSQS_SQS_WAIT_TIME))) {
             this.waitTime = Integer.parseInt(properties
@@ -141,7 +164,10 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         receiveMessageRequest = new ReceiveMessageRequest(destination);
         receiveMessageRequest.withMaxNumberOfMessages(maxNoOfMessage);
         receiveMessageRequest.withWaitTimeSeconds(waitTime);
-        credentials = new BasicAWSCredentials(accessKey, secretKey);
+        
+        if(isRequireKeys){
+        	credentials = new BasicAWSCredentials(accessKey, secretKey);
+        }
         logger.info("Initialized the AmazonSQS inbound consumer " + name);
     }
 
@@ -155,7 +181,13 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         }
         try {
             if (!isConnected) {
-                sqsClient = new AmazonSQSClient(this.credentials);
+            	
+            	if(isRequireKeys){
+                    sqsClient = new AmazonSQSClient(this.credentials);
+            	}
+            	else{
+            		sqsClient = new AmazonSQSClient(new DefaultAWSCredentialsProviderChain());
+            	}
                 isConnected = true;
             }
             if (sqsClient == null) {
