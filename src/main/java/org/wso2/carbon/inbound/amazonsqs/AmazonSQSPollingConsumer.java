@@ -171,7 +171,8 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                     boolean commitOrRollbacked;
                     if (logger.isDebugEnabled()) {
                         logger.debug("Injecting AmazonSQS message to the sequence : "
-                                + injectingSeq + " of " + name);
+                                + injectingSeq + " of " + name + " messageId: " + message.getMessageId()
+                                + " with ReceiptHandle " + message.getReceiptHandle());
                     }
                     //Get the content type of the message.
                     if (message.getMessageAttributes().containsKey(AmazonSQSConstants.CONTENT_TYPE)) {
@@ -206,7 +207,16 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                     commitOrRollbacked = injectMessage(message.getBody(), contentType);
                     if (commitOrRollbacked && autoRemoveMessage) {
                         messageReceiptHandle = message.getReceiptHandle();
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Deleting AmazonSQS messageId: " + message.getMessageId()
+                                + " with ReceiptHandle " + message.getReceiptHandle());
+                        }                        
                         sqsClient.deleteMessage(new DeleteMessageRequest(destination, messageReceiptHandle));
+                    } else {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Not deleting AmazonSQS messageId: " + message.getMessageId()
+                                + " with ReceiptHandle " + message.getReceiptHandle());
+                        }                        
                     }
                 }
             } else {
