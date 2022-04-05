@@ -77,6 +77,8 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     private MessageContext msgCtx;
     //To check whether the message need to be deleted or not from the queue.
     private boolean autoRemoveMessage;
+    // To check whether to use the default credential provider chain or not.
+    private boolean useDefaultCredentialProviderChain;
 
     public AmazonSQSPollingConsumer(Properties amazonsqsProperties, String name,
                                     SynapseEnvironment synapseEnvironment, long scanInterval,
@@ -96,14 +98,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         String accessKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_ACCESSKEY);
         //SecretKey to interact with Amazon SQS.
         String secretKey = properties.getProperty(AmazonSQSConstants.AMAZONSQS_SECRETKEY);
+        // Check for the type of credential provider to be used for authentication.
+        inferCredentialProvider(secretKey, accessKey);
+
         if (StringUtils.isEmpty(destination)) {
             throw new SynapseException("URL for the AmazonSQS Queue is empty");
-        }
-        if (StringUtils.isEmpty(accessKey)) {
-            throw new SynapseException("Accesskey is empty");
-        }
-        if (StringUtils.isEmpty(secretKey)) {
-            throw new SynapseException("Secretkey is empty");
         }
         if (StringUtils.isNotEmpty(properties.getProperty(AmazonSQSConstants.AMAZONSQS_SQS_WAIT_TIME))) {
             this.waitTime = Integer.parseInt(properties
@@ -141,7 +140,10 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         receiveMessageRequest = new ReceiveMessageRequest(destination);
         receiveMessageRequest.withMaxNumberOfMessages(maxNoOfMessage);
         receiveMessageRequest.withWaitTimeSeconds(waitTime);
-        credentials = new BasicAWSCredentials(accessKey, secretKey);
+
+        if (!useDefaultCredentialProviderChain) {
+            credentials = new BasicAWSCredentials(accessKey, secretKey);
+        }
         logger.info("Initialized the AmazonSQS inbound consumer " + name);
     }
 
@@ -155,7 +157,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         }
         try {
             if (!isConnected) {
-                sqsClient = new AmazonSQSClient(this.credentials);
+                if (useDefaultCredentialProviderChain) {
+                    sqsClient = new AmazonSQSClient();
+                } else {
+                    sqsClient = new AmazonSQSClient(this.credentials);
+                }
                 isConnected = true;
             }
             if (sqsClient == null) {
@@ -303,6 +309,30 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             return false;
         }
         return false;
+    }
+
+    /**
+     * Infer the credential type. If both the secret key and the access key are provided, they will be directly
+     * used for authentication. If none of them are provided, the credentials will be taken in the order specified
+     * in the default credentials provider chain. If only one out of secret and access key is provided, it will be
+     * considered as an invalid combination and an runtime exception will be thrown accordingly.
+     *
+     * @param secretKey the key that is used to sign requests
+     * @param accessKey the key that corresponds to the secret key that is used to sign the request
+     */
+    private void inferCredentialProvider(String secretKey, String accessKey) {
+
+        if (StringUtils.isEmpty(secretKey)) {
+            if (StringUtils.isEmpty(accessKey)) {
+                useDefaultCredentialProviderChain = true;
+            } else {
+                throw new SynapseException("SecretKey is empty");
+            }
+        } else {
+            if (StringUtils.isEmpty(accessKey)) {
+                throw new SynapseException("AccessKey is empty");
+            }
+        }
     }
 
     /**
