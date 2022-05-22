@@ -20,7 +20,7 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.synapse.inbound.amazonsqs</groupId>
     <artifactId>org.apache.synapse.amazonsqs.poll.class</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.1.0</version>
     <name>AmazonSQS Polling Consumer</name>
     <url>http://wso2.org</url>
     <packaging>bundle</packaging>
