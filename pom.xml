@@ -20,7 +20,7 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.synapse.inbound.amazonsqs</groupId>
     <artifactId>org.apache.synapse.amazonsqs.poll.class</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>AmazonSQS Polling Consumer</name>
     <url>http://wso2.org</url>
     <packaging>bundle</packaging>
@@ -28,6 +28,11 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-osgi</artifactId>
+            <version>${amazonaws.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
             <version>${amazonaws.version}</version>
         </dependency>
         <dependency>
@@ -186,9 +191,9 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
         </snapshotRepository>
     </distributionManagement>
     <properties>
-        <amazonaws.version>1.11.30</amazonaws.version>
+        <amazonaws.version>1.12.40</amazonaws.version>
         <carbon.mediation.version>4.4.10</carbon.mediation.version>
-        <httpclient.osgi.version>4.5.2</httpclient.osgi.version>
+        <httpclient.osgi.version>4.5.14</httpclient.osgi.version>
         <httpcore.osgi.version>4.4.4</httpcore.osgi.version>
     </properties>
 </project>
