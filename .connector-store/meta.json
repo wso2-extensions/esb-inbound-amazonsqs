@@ -1,0 +1,25 @@
+{
+    "name": "Amazon Simple Queue Service (Inbound)",
+    "owner": "WSO2",
+    "category": "Inbound Endpoint",
+    "documentationUrl": "https://ei.docs.wso2.com/en/latest/micro-integrator/references/connectors/amazonsqs-connector/amazonsqs-connector-overview/",
+    "description": "Amazon SQS offers reliable and scalable hosted queues for storing messages as they travel between computers. By using Amazon SQS, you can move data between distributed components of your applications that perform different tasks without losing messages or requiring each component to be always available.",
+    "status": "Active",
+    "labels": [
+        "queues"
+    ],
+    "releases": [
+        {
+            "tagName": "v1.1.1",
+            "products": [
+                "EI 7.1.0",
+                "EI 7.0.x",
+                "EI 6.6.0",
+                "EI 6.5.0",
+                "MI 4.0.0",
+                "MI 4.1.0"
+            ],
+            "isHidden": false
+        }
+    ]
+}
