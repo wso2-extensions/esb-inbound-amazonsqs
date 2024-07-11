@@ -311,7 +311,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                 return false;
             }
         } catch (Exception e) {
-            throw new SynapseException("Error while processing the Amazon SQS Message ", e);
+            throw new SynapseException(e.getMessage(), e);
         }
         return true;
     }
