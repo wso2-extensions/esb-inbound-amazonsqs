@@ -28,6 +28,7 @@ import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.SOAPBuilder;
@@ -37,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -174,7 +176,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             messages = sqsClient.receiveMessage(receiveMessageRequest).getMessages();
             if (!messages.isEmpty()) {
                 for (Message message : messages) {
-                    boolean commitOrRollbacked;
+                    boolean commitOrRollbacked = false;
                     if (logger.isDebugEnabled()) {
                         logger.debug("Injecting AmazonSQS message to the sequence : "
                                 + injectingSeq + " of " + name + " messageId: " + message.getMessageId()
@@ -210,7 +212,19 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                             }
                         }
                     }
-                    commitOrRollbacked = injectMessage(message.getBody(), contentType);
+                    try {
+                        commitOrRollbacked = injectMessage(message.getBody(), contentType);
+                    } catch (SynapseException e) {
+                        if (e.getMessage().contains("Parser error :")) {
+                            logger.warn("Deleting malformed AmazonSQS messageId: " + message.getMessageId()
+                                    + " with ReceiptHandle " + message.getReceiptHandle());
+                            messageReceiptHandle = message.getReceiptHandle();
+                            sqsClient.deleteMessage(new DeleteMessageRequest(destination, messageReceiptHandle));
+                        } else {
+                            // Re-throw the exception or handle it differently
+                            throw e;
+                        }
+                    }
                     if (commitOrRollbacked && autoRemoveMessage) {
                         messageReceiptHandle = message.getReceiptHandle();
                         if (logger.isDebugEnabled()) {
@@ -266,7 +280,14 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                 }
                 builder = new SOAPBuilder();
             }
-            OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
+            OMElement documentElement;
+            try {
+                documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
+            } catch (Exception e) {
+                injectErrorMessage("Error while processing the Amazon SQS Message"
+                        , AmazonSQSConstants.MESSAGE_BUILD_FAILURE, msgCtx, strMessage);
+                throw new SynapseException("Parser error : ", e);
+            }
             //Inject the message to the sequence.
             msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
             if (this.injectingSeq == null || "".equals(this.injectingSeq)) {
@@ -292,6 +313,36 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
         } catch (Exception e) {
             throw new SynapseException("Error while processing the Amazon SQS Message ", e);
         }
+        return true;
+    }
+
+    private boolean injectErrorMessage(String message, String errorCode, MessageContext msgCtx, String faultMessage) {
+
+        if (StringUtils.isEmpty(this.onErrorSeq)) {
+            logger.error("Could not mediate the error message as the 'onError' sequence name not specified for SQS "
+                    + "Inbound Endpoint: " + name + ". Hence, no retry attempted on failure.");
+            return false;
+        }
+
+        SequenceMediator errorSeq = (SequenceMediator) this.synapseEnvironment.getSynapseConfiguration().getSequence(
+                this.onErrorSeq);
+        if (errorSeq == null) {
+            logger.error("Could not mediate the error message as the 'onError' Sequence with name: " + this.onErrorSeq
+                    + " not found. Hence, no retry attempted on failure.");
+            return false;
+        }
+
+        // Populate error details to the message context as properties
+        msgCtx.setProperty(SynapseConstants.ERROR_CODE, errorCode);
+        msgCtx.setProperty(SynapseConstants.ERROR_MESSAGE, message);
+        msgCtx.setProperty(AmazonSQSConstants.MALFORMED_PAYLOAD, faultMessage);
+
+        if (!this.synapseEnvironment.injectInbound(msgCtx, errorSeq, this.sequential)) {
+            logger.warn("Could not inject the error details to 'onError' sequence: " + this.onErrorSeq
+                    + " of SQS Inbound Endpoint: " + name);
+            return false;
+        }
+
         return true;
     }
 

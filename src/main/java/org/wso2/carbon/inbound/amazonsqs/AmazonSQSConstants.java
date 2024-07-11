@@ -25,6 +25,8 @@ package org.wso2.carbon.inbound.amazonsqs;
  */
 public class AmazonSQSConstants {
     public static final String AMAZONSQS_SQS_WAIT_TIME = "wait_time";
+    public static final String MALFORMED_PAYLOAD = "MALFORMED_PAYLOAD";
+    public static final String MESSAGE_BUILD_FAILURE = "700803";
     public static final String AMAZONSQS_SQS_MAX_NO_OF_MESSAGE = "maxNoOfMessage";
     public static final String DESTINATION = "destination";
     public static final String AMAZONSQS_ACCESSKEY = "accessKey";
