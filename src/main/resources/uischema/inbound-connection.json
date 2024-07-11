@@ -1,0 +1,105 @@
+{
+  "name": "amazonSQSInbound",
+  "type": "connector",
+  "title": "Amazon SQS Inbound Connector",
+  "help": "Configure the Amazon SQS inbound connector settings.",
+  "elements": [
+    {
+      "type": "attribute",
+      "value": {
+        "name": "accessKey",
+        "displayName": "Access Key",
+        "inputType": "string",
+        "required": "true",
+        "helpTip": "Provide the AWS access key for authentication."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "secretKey",
+        "displayName": "Secret Key",
+        "inputType": "string",
+        "required": "true",
+        "helpTip": "Provide the AWS secret key for authentication."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "destination",
+        "displayName": "Destination",
+        "inputType": "string",
+        "required": "true",
+        "helpTip": "Specify the Amazon SQS queue destination."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "wait_time",
+        "displayName": "Wait Time",
+        "inputType": "string",
+        "required": "false",
+        "helpTip": "The duration (in seconds) the call waits for a message to arrive in the queue before returning."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "maxNoOfMessage",
+        "displayName": "Max Number of Messages",
+        "inputType": "string",
+        "required": "false",
+        "helpTip": "The maximum number of messages to return."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "contentType",
+        "displayName": "Content Type",
+        "inputType": "combo",
+        "defaultValue": "text/plain",
+        "comboValues": [
+          "text/plain",
+          "application/json",
+          "application/xml"
+        ],
+        "required": "false",
+        "helpTip": "The content type of the messages."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "SET_ROLLBACK_ONLY",
+        "displayName": "Set Rollback Only",
+        "inputType": "boolean",
+        "required": "false",
+        "helpTip": "Specify whether to mark the message as rollback only."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "autoRemoveMessage",
+        "displayName": "Auto Remove Message",
+        "inputType": "boolean",
+        "required": "true",
+        "helpTip": "Automatically remove the message from the queue after processing."
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "attributeNames",
+        "displayName": "Attribute Names",
+        "inputType": "string",
+        "defaultValue": "All",
+        "required": "false",
+        "helpTip": "Specify which message attribute names to retrieve."
+      }
+    }
+  ]
+}
