@@ -1,6 +1,6 @@
 {
   "name": "amazonSQSInbound",
-  "type": "connector",
+  "type": "inbound-connector",
   "title": "Amazon SQS Inbound Connector",
   "help": "Configure the Amazon SQS inbound connector settings.",
   "elements": [
