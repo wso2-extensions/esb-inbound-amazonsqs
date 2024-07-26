@@ -62,15 +62,7 @@
               "required": "false",
               "helpTip": "Suspend Inbound"
             }
-          }
-        ]
-      }
-    },
-    {
-      "type": "attributeGroup",
-      "value": {
-        "groupName": "Inbound Properties",
-        "elements": [
+          },
           {
             "type": "attribute",
             "value": {
@@ -109,7 +101,7 @@
     {
       "type": "attributeGroup",
       "value": {
-        "groupName": "Basic",
+        "groupName": "AWS SQS Basic",
         "elements": [
           {
             "type": "attribute",
@@ -143,7 +135,7 @@
     {
       "type": "attributeGroup",
       "value": {
-        "groupName": "Security",
+        "groupName": "AWS SQS Security",
         "elements": [
           {
             "type": "attribute",
@@ -171,7 +163,7 @@
     {
       "type": "attributeGroup",
       "value": {
-        "groupName": "Advanced",
+        "groupName": "AWS SQS Advanced",
         "elements": [
           {
             "type": "attribute",
