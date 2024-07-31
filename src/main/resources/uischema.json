@@ -56,13 +56,21 @@
             "value": {
               "name": "suspend",
               "displayName": "Suspend Inbound",
-              "inputType": "boolean",
+              "inputType": "checkbox",
               "defaultValue": false,
               "hidden": true,
               "required": "false",
               "helpTip": "Suspend Inbound"
             }
-          },
+          }
+        ]
+      }
+    },
+    {
+      "type": "attributeGroup",
+      "value": {
+        "groupName": "Inbound Functional",
+        "elements": [
           {
             "type": "attribute",
             "value": {
@@ -78,7 +86,7 @@
             "value": {
               "name": "sequential",
               "displayName": "Execute sequentially",
-              "inputType": "boolean",
+              "inputType": "checkbox",
               "defaultValue": true,
               "required": "false",
               "helpTip": "The behaviour when executing the given sequence."
@@ -89,7 +97,7 @@
             "value": {
               "name": "coordination",
               "displayName": "Coordination",
-              "inputType": "boolean",
+              "inputType": "checkbox",
               "defaultValue": true,
               "required": "false",
               "helpTip": "In a clustered setup, this will run the inbound only in a single worker node."
@@ -136,6 +144,7 @@
       "type": "attributeGroup",
       "value": {
         "groupName": "AWS SQS Security",
+        "isCollapsed": true,
         "elements": [
           {
             "type": "attribute",
@@ -164,6 +173,7 @@
       "type": "attributeGroup",
       "value": {
         "groupName": "AWS SQS Advanced",
+        "isCollapsed": true,
         "elements": [
           {
             "type": "attribute",
@@ -188,20 +198,9 @@
           {
             "type": "attribute",
             "value": {
-              "name": "SET_ROLLBACK_ONLY",
-              "displayName": "Rollback Message",
-              "inputType": "boolean",
-              "required": "false",
-              "defaultValue": false,
-              "helpTip": "Rollback the SQS message to AWS if a failure occurs."
-            }
-          },
-          {
-            "type": "attribute",
-            "value": {
               "name": "autoRemoveMessage",
               "displayName": "Auto Remove Message",
-              "inputType": "boolean",
+              "inputType": "checkbox",
               "required": "false",
               "defaultValue": true,
               "helpTip": "Automatically remove the message from the queue after processing."
