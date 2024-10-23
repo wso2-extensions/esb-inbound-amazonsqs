@@ -266,6 +266,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             }
             org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) msgCtx).getAxis2MessageContext();
             Builder builder;
+            msgCtx.setProperty(AmazonSQSConstants.INBOUND_ENDPOINT_NAME, name);
             if (StringUtils.isEmpty(contentType)) {
                 logger.warn("Unable to determine content type for message, setting to text/plain for " + name);
                 contentType = AmazonSQSConstants.DEFAULT_CONTENT_TYPE;
