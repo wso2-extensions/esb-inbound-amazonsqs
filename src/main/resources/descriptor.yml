@@ -1,0 +1,20 @@
+# Connector Descriptor File
+ # Specifies the dependencies and repositories required for the connector.
+ 
+ dependencies:
+   - groupId: "org.wso2.integration.inbound"
+     artifactId: "mi-inbound-amazonsqs"
+     version: "${amazonsqs.inbound.version}"
+   - groupId: "com.amazonaws"
+     artifactId: "aws-java-sdk-osgi"
+     version: "${amazonaws.version}"
+   - groupId: "org.apache.httpcomponents"
+     artifactId: "httpclient-osgi"
+     version: "${httpclient.osgi.version}"
+   - groupId: "org.apache.httpcomponents"
+     artifactId: "httpcore-osgi"
+     version: "${httpcore.osgi.version}"
+ 
+ repositories:
+   - id: "wso2-nexus"
+     url: "https://maven.wso2.org/nexus/content/groups/wso2-public/"

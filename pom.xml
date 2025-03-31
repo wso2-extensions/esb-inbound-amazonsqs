@@ -20,10 +20,10 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.integration.inbound</groupId>
     <artifactId>mi-inbound-amazonsqs</artifactId>
-    <version>1.1.6-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>AmazonSQS Polling Consumer</name>
     <url>http://wso2.org</url>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -39,16 +39,6 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
             <version>${carbon.mediation.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient-osgi</artifactId>
-            <version>${httpclient.osgi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore-osgi</artifactId>
-            <version>${httpcore.osgi.version}</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -161,6 +151,9 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
+                    <filters>
+                         <filter>${basedir}/src/main/assembly/filter.properties</filter>
+                     </filters>
                     <descriptors>
                         <descriptor>src/main/assembly/zip-assembly.xml</descriptor>
                     </descriptors>
@@ -176,45 +169,14 @@ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.4.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>
-                            org.wso2.carbon.inbound.amazonsqs.*;version="${project.version}"
-                        </Export-Package>
-                        <Import-Package>
-                            !javax.xml.namespace,
-                            org.apache.http.*; version=${httpcore.osgi.version},
-                            com.amazonaws.*; version="${amazonaws.version}",
-                            javax.xml.namespace; version=0.0.0,
-                            <!--importing generic version since this is exported in two different versions in mediation
-                             and micro integrator-->
-                            org.wso2.carbon.inbound.endpoint.protocol.generic;version="0.0.0",
-                            *;resolution:=optional,
-                        </Import-Package>
-                        <Embed-Dependency>httpcore-osgi,httpclient-osgi,aws-java-sdk-osgi;scope=*
-                        </Embed-Dependency>
-                    </instructions>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <distributionManagement>
         <repository>
             <id>nexus-releases</id>
             <name>WSO2 Release Distribution Repository</name>
-            <url>https://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
+            <url>https://maven.wso2.org/nexus/content/repositories/releases/</url>
         </repository>
-        <snapshotRepository>
-            <id>wso2.snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>https://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
     <properties>
         <amazonaws.version>1.12.40</amazonaws.version>
