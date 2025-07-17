@@ -18,13 +18,139 @@
     ],
     "releases": [
         {
-            "tagName": "v2.0.0",
+            "tagName": "v2.0.1",
             "products": [
                 "MI 4.4.0"
             ],
-            "operations": [],
-            "connections": [],
-            "isHidden": false
+            "operations": [
+                {
+                    "name": "init",
+                    "description": "Initialize Kafka Inbound Endpoint",
+                    "params": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "required": true,
+                            "defaultValue": "",
+                            "description": "Unique identifier for the AWS SQS event integration"
+                        },
+                        {
+                            "name": "class",
+                            "type": "string",
+                            "required": true,
+                            "defaultValue": "org.wso2.carbon.inbound.amazonsqs.AmazonSQSPollingConsumer",
+                            "description": ""
+                        },
+                        {
+                            "name": "generateSequences",
+                            "type": "checkbox",
+                            "required": false,
+                            "defaultValue": "True",
+                            "description": ""
+                        },
+                        {
+                            "name": "sequence",
+                            "type": "keyOrExpression",
+                            "required": true,
+                            "defaultValue": "",
+                            "description": "Sequence to inject the incoming AWS SQS message"
+                        },
+                        {
+                            "name": "onError",
+                            "type": "keyOrExpression",
+                            "required": true,
+                            "defaultValue": "",
+                            "description": "Error sequence to invoke on fault"
+                        },
+                        {
+                            "name": "suspend",
+                            "type": "checkbox",
+                            "required": false,
+                            "defaultValue": "False",
+                            "description": "Suspend Inbound"
+                        },
+                        {
+                            "name": "interval",
+                            "type": "string",
+                            "required": true,
+                            "defaultValue": "",
+                            "description": "The polling interval for the AWS SQS inbound endpoint."
+                        },
+                        {
+                            "name": "sequential",
+                            "type": "checkbox",
+                            "required": false,
+                            "defaultValue": "True",
+                            "description": "The behaviour when executing the given sequence."
+                        },
+                        {
+                            "name": "coordination",
+                            "type": "checkbox",
+                            "required": false,
+                            "defaultValue": "True",
+                            "description": "In a clustered setup, this will run the inbound only in a single worker node."
+                        },
+                        {
+                            "name": "destination",
+                            "type": "string",
+                            "required": true,
+                            "defaultValue": "",
+                            "description": "Specify the Amazon SQS queue destination."
+                        },
+                        {
+                            "name": "contentType",
+                            "type": "combo",
+                            "required": false,
+                            "defaultValue": "text/plain",
+                            "description": "The content type of the messages."
+                        },
+                        {
+                            "name": "accessKey",
+                            "type": "string",
+                            "required": false,
+                            "defaultValue": "",
+                            "description": "Provide the AWS access key for authentication. Not required if IAM Role authentication is used."
+                        },
+                        {
+                            "name": "secretKey",
+                            "type": "string",
+                            "required": false,
+                            "defaultValue": "",
+                            "description": "Provide the AWS secret key for authentication. Not required if IAM Role authentication is used."
+                        },
+                        {
+                            "name": "wait_time",
+                            "type": "string",
+                            "required": false,
+                            "defaultValue": "",
+                            "description": "The duration (in seconds) the call waits for a message to arrive in the queue before returning."
+                        },
+                        {
+                            "name": "maxNoOfMessage",
+                            "type": "string",
+                            "required": false,
+                            "defaultValue": "",
+                            "description": "The maximum number of messages to return."
+                        },
+                        {
+                            "name": "autoRemoveMessage",
+                            "type": "checkbox",
+                            "required": false,
+                            "defaultValue": "True",
+                            "description": "Automatically remove the message from the queue after processing."
+                        },
+                        {
+                            "name": "attributeNames",
+                            "type": "string",
+                            "required": false,
+                            "defaultValue": "All",
+                            "description": "Specify which message attribute names to retrieve."
+                        }
+                    ],
+                    "isHidden": false
+                }
+            ],
+            "connections": []
         },
         {
             "tagName": "v1.1.5",
