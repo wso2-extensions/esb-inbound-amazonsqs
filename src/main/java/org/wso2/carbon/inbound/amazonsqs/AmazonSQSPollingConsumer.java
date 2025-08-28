@@ -413,4 +413,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
             logger.error("Error while shutdown the AmazonSQS " + name + " " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Resume the connection to the Amazon SQS.
+     */
+    public void resume() {
+        isConnected = false;
+    }
 }
