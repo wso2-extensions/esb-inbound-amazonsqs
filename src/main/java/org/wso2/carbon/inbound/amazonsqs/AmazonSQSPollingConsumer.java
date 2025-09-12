@@ -420,4 +420,11 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     public void resume() {
         isConnected = false;
     }
+
+    /**
+     * Pause the connection to the Amazon SQS.
+     */
+    public void pause() {
+        destroy();
+    }
 }
