@@ -408,6 +408,8 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
                 if (logger.isDebugEnabled()) {
                     logger.debug("The AmazonSQS has been shutdown ! for " + name);
                 }
+                isConnected = false;
+                sqsClient = null;
             }
         } catch (Exception e) {
             logger.error("Error while shutdown the AmazonSQS " + name + " " + e.getMessage(), e);
