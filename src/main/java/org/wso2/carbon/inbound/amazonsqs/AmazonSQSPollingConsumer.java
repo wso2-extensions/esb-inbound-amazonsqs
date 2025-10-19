@@ -68,6 +68,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     private AmazonSQS sqsClient;
     //To check the connection to the Amazon SQS Queue.
     private boolean isConnected;
+    private volatile boolean isPaused = false;
     //URL of the Amazon SQS Queue from which you want to consume messages.
     private String destination;
     private ReceiveMessageRequest receiveMessageRequest;
@@ -418,6 +419,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
      * Resume the connection to the Amazon SQS.
      */
     public void resume() {
+        logger.info("Resume operation called for inbound consumer: " + name);
         isConnected = false;
     }
 
@@ -425,6 +427,6 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
      * Pause the connection to the Amazon SQS.
      */
     public void pause() {
-        destroy();
+        logger.info("Pause operation called for inbound consumer: " + name);
     }
 }
