@@ -418,6 +418,7 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
      * Resume the connection to the Amazon SQS.
      */
     public void resume() {
+        logger.info("Resume operation called for inbound consumer: " + name);
         isConnected = false;
     }
 
@@ -425,6 +426,6 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
      * Pause the connection to the Amazon SQS.
      */
     public void pause() {
-        destroy();
+        logger.info("Pause operation called for inbound consumer: " + name);
     }
 }
