@@ -68,7 +68,6 @@ public class AmazonSQSPollingConsumer extends GenericPollingConsumer {
     private AmazonSQS sqsClient;
     //To check the connection to the Amazon SQS Queue.
     private boolean isConnected;
-    private volatile boolean isPaused = false;
     //URL of the Amazon SQS Queue from which you want to consume messages.
     private String destination;
     private ReceiveMessageRequest receiveMessageRequest;
